@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand: #1484f5;
+  --brand-glow: #2aa3ff;
+  --dark: #0f0f1a;
+  --dark-card: #1a1a2e;
+}
+
+body {
+  background: var(--dark);
+  color: #e0e0e0;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #2aa3ff, #00d26a, #2aa3ff);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+}
+
+@keyframes shimmer {
+  to { background-position: 200% center; }
+}
+
+.glow-blue {
+  box-shadow: 0 0 30px rgba(20, 132, 245, 0.3), 0 0 60px rgba(20, 132, 245, 0.1);
+}
+
+.glow-green {
+  box-shadow: 0 0 30px rgba(0, 210, 106, 0.3), 0 0 60px rgba(0, 210, 106, 0.1);
+}
+
+.card-glass {
+  background: rgba(26, 26, 46, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.5); }
+}
+
+.hero-grid {
+  background-image:
+    linear-gradient(rgba(20, 132, 245, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(20, 132, 245, 0.05) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.unlock-animation {
+  animation: unlock 2s ease-in-out infinite;
+}
+
+@keyframes unlock {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+}
+
+.float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.counter {
+  font-variant-numeric: tabular-nums;
+}
+
+.btn-primary {
+  @apply bg-gradient-to-r from-brand-600 to-brand-500 text-white font-bold py-4 px-8 rounded-xl
+    hover:from-brand-500 hover:to-brand-400 transition-all duration-300 transform hover:scale-105
+    shadow-lg hover:shadow-brand-500/25;
+}
+
+.btn-success {
+  @apply bg-gradient-to-r from-green-600 to-emerald-500 text-white font-bold py-4 px-8 rounded-xl
+    hover:from-green-500 hover:to-emerald-400 transition-all duration-300 transform hover:scale-105
+    shadow-lg hover:shadow-green-500/25;
+}
+
+.section-title {
+  @apply text-3xl md:text-5xl font-black text-center mb-4;
+}
+
+@media (max-width: 768px) {
+  .section-title { @apply text-2xl; }
+}
