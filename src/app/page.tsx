@@ -6,14 +6,15 @@ import { useState, useEffect, useRef } from "react";
    ============================================================ */
 
 const SERVICES = [
-  { id: "wifi", icon: "📡", name: "WiFi / Router", price: 29.99, success: "85-95%", time: "1-30 min", desc: "Recupera la clave de tu WiFi o router. Funciona con Movistar, Vodafone, Orange, Digi y mas.", online: true },
-  { id: "phone", icon: "📱", name: "Movil / Tablet", price: 79.99, success: "60-90%", time: "15-60 min", desc: "Desbloquea Android o iPhone. PIN, patron, Face ID, contrasena olvidada.", online: true },
-  { id: "computer", icon: "💻", name: "Ordenador", price: 59.99, success: "95%+", time: "15-45 min", desc: "Windows, Mac o Linux. Recupera el acceso a tu PC sin perder datos.", online: true },
-  { id: "camera", icon: "📹", name: "Camara / DVR", price: 49.99, success: "90%+", time: "5-15 min", desc: "Dahua, Hikvision, Reolink, TP-Link y 20+ marcas. Recupera acceso a tus camaras.", online: true },
-  { id: "wallet", icon: "🪙", name: "Wallet Crypto", price: 149.99, success: "30-70%", time: "1-24h", desc: "Bitcoin, Ethereum, MetaMask, Exodus. Recupera el acceso a tu dinero digital.", online: false },
-  { id: "email", icon: "📧", name: "Email / Cuentas", price: 19.99, success: "Variable", time: "10-30 min", desc: "Gmail, Outlook, Yahoo, iCloud. Te guiamos paso a paso para recuperar tu cuenta.", online: true },
-  { id: "card", icon: "💳", name: "Tarjeta / PIN", price: 14.99, success: "Banco", time: "5-10 min", desc: "Olvidaste el PIN de tu tarjeta? Te ayudamos con el proceso de recuperacion.", online: true },
-  { id: "safe", icon: "🔐", name: "Caja Fuerte", price: 39.99, success: "80%+", time: "10-60 min", desc: "Cajas fuertes, candados digitales, cerraduras inteligentes. Base de datos de combinaciones.", online: false },
+  { id: "wifi", icon: "📡", name: "WiFi / Router", price: 29.99, success: "99%", time: "1-3 min", desc: "Recupera la clave de tu WiFi o router. Movistar, Vodafone, Orange, Digi. Reset + claves de fabrica.", online: true },
+  { id: "phone", icon: "📱", name: "Movil / Tablet", price: 79.99, success: "90%+", time: "5-15 min", desc: "Desbloquea Android o iPhone. Samsung Find My, Google Find My, factory reset. Sin perder datos si es posible.", online: true },
+  { id: "computer", icon: "💻", name: "Ordenador", price: 59.99, success: "99%", time: "5-15 min", desc: "Windows y Mac. Kit USB profesional que resetea la contrasena sin perder NINGUN dato. 100% seguro.", online: true },
+  { id: "camera", icon: "📹", name: "Camara / DVR", price: 49.99, success: "99%", time: "2-10 min", desc: "Dahua, Hikvision, Reolink, TP-Link. Reset fisico + herramientas oficiales del fabricante.", online: true },
+  { id: "wallet", icon: "🪙", name: "Wallet Crypto", price: 149.99, success: "50-80%", time: "5 min - 24h", desc: "Bitcoin, Ethereum, MetaMask, Exodus, Ledger. Recuperacion por frase semilla + contrasenas guardadas.", online: false },
+  { id: "email", icon: "📧", name: "Email / Cuentas", price: 19.99, success: "85%+", time: "5-15 min", desc: "Gmail, Outlook, Yahoo, iCloud. Recuperacion oficial + contrasenas guardadas en navegador. Rapido.", online: true },
+  { id: "card", icon: "💳", name: "Tarjeta / PIN", price: 14.99, success: "100%", time: "5 min", desc: "Recupera el PIN de tu tarjeta desde la app del banco o llamando. BBVA, CaixaBank, Santander y mas.", online: true },
+  { id: "safe", icon: "🔐", name: "Caja Fuerte", price: 39.99, success: "80%+", time: "10-60 min", desc: "Cajas fuertes electronicas. Codigos de fabrica + llave de emergencia. Arregui, Yale, BTV y mas.", online: false },
+  { id: "lock", icon: "🚪", name: "Cerradura Digital", price: 44.99, success: "90%+", time: "5-15 min", desc: "Yale, Samsung, Nuki y mas. Reset de codigo, pila de emergencia, llave fisica.", online: false },
 ];
 
 const STORE_PRODUCTS = [
@@ -89,13 +90,27 @@ export default function Home() {
   const handleUnlock = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/unlock", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(unlockForm),
+      // Smart unlock: detecta modelo y genera plan personalizado
+      const [smartRes, standardRes] = await Promise.all([
+        fetch("/api/smart-unlock", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(unlockForm),
+        }).catch(() => null),
+        fetch("/api/unlock", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(unlockForm),
+        }),
+      ]);
+      const smartData = smartRes ? await smartRes.json().catch(() => null) : null;
+      const standardData = await standardRes.json();
+
+      // Merge: smart plan + standard methods
+      setUnlockResult({
+        ...standardData,
+        smart: smartData?.plan || null,
       });
-      const data = await res.json();
-      setUnlockResult(data);
     } catch { setUnlockResult({ error: true, message: "Error de conexion. Intentalo de nuevo." }); }
     setLoading(false);
   };
@@ -178,7 +193,7 @@ export default function Home() {
       <section id="servicios" className="py-20 px-4">
         <div className="max-w-7xl mx-auto">
           <h2 className="section-title text-white">Nuestros <span className="gradient-text">Servicios</span></h2>
-          <p className="text-center text-gray-400 mb-12 max-w-2xl mx-auto">8 servicios profesionales de desbloqueo. Siempre con autorizacion del propietario.</p>
+          <p className="text-center text-gray-400 mb-12 max-w-2xl mx-auto">9 servicios profesionales de desbloqueo. Presencial y online. Siempre con autorizacion del propietario.</p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             {SERVICES.map((s) => (
@@ -217,7 +232,7 @@ export default function Home() {
             {[
               { step: "1", icon: "📋", title: "Describe tu problema", desc: "Dinos que dispositivo tienes bloqueado y que ha pasado" },
               { step: "2", icon: "🪪", title: "Verificamos propiedad", desc: "DNI, foto con el dispositivo, o declaracion jurada. Flexible para todos" },
-              { step: "3", icon: "⚡", title: "Desbloqueamos", desc: "Nuestro sistema prueba millones de combinaciones en segundos" },
+              { step: "3", icon: "⚡", title: "Desbloqueamos", desc: "Instrucciones al instante + soporte remoto si necesitas ayuda" },
               { step: "4", icon: "✅", title: "Acceso recuperado!", desc: "Solo pagas si funciona. Te damos la clave o desbloqueamos el dispositivo" },
             ].map((s) => (
               <div key={s.step} className="text-center">
@@ -448,19 +463,119 @@ export default function Home() {
                 {unlockResult.error ? (
                   <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400">{unlockResult.message}</div>
                 ) : (
-                  <div>
-                    <div className="bg-success/10 border border-success/20 rounded-xl p-4 mb-4">
-                      <p className="text-success font-bold">Solicitud recibida!</p>
-                      <p className="text-sm text-gray-400 mt-1">Te contactaremos en menos de 30 minutos.</p>
+                  <div className="space-y-4">
+                    <div className="bg-success/10 border border-success/20 rounded-xl p-4">
+                      <p className="text-success font-bold text-lg">Instrucciones listas!</p>
+                      <p className="text-sm text-gray-400 mt-1">{unlockResult.message}</p>
                     </div>
-                    {unlockResult.steps && (
-                      <div className="space-y-2">
-                        <p className="text-white font-bold text-sm">Instrucciones inmediatas:</p>
-                        {unlockResult.steps.map((s: string, i: number) => (
-                          <p key={i} className="text-sm text-gray-400">{i + 1}. {s}</p>
+
+                    {/* SMART UNLOCK — Plan personalizado si se detecto modelo */}
+                    {unlockResult.smart?.detected_device && (
+                      <div className="bg-brand-600/10 border border-brand-500/30 rounded-xl p-4">
+                        <p className="text-brand-400 font-bold text-sm">Dispositivo detectado: {unlockResult.smart.detected_device}</p>
+                        {unlockResult.smart.account_type && unlockResult.smart.account_type !== "unknown" && (
+                          <p className="text-xs text-gray-400 mt-1">Tipo de cuenta: {unlockResult.smart.account_type === "microsoft" ? "Microsoft (online)" : "Local"}</p>
+                        )}
+                      </div>
+                    )}
+
+                    {unlockResult.smart?.steps?.map((step: any, si: number) => (
+                      <div key={`smart-${si}`} className="bg-white/5 rounded-xl p-4 border border-brand-500/10">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-white font-bold text-sm">{step.title}</h4>
+                          {step.time && <span className="text-xs bg-brand-600/20 text-brand-400 px-2 py-0.5 rounded-full">{step.time}</span>}
+                        </div>
+                        {step.detail?.map((line: string, li: number) => (
+                          <p key={li} className={`text-sm py-0.5 ${line === "" ? "h-2" : line.startsWith("  ") ? "text-gray-500 pl-4" : "text-gray-400 pl-2 border-l-2 border-brand-600/30"}`}>
+                            {line}
+                          </p>
+                        ))}
+                      </div>
+                    ))}
+
+                    {/* METODOS GENERALES (si no hubo smart match) */}
+                    {unlockResult.result?.estimated_time && !(unlockResult.smart?.steps?.length > 1) && (
+                      <div className="flex gap-3">
+                        <div className="bg-brand-600/10 border border-brand-500/20 rounded-lg px-3 py-2 text-center flex-1">
+                          <p className="text-brand-400 font-bold text-sm">{unlockResult.result.estimated_time}</p>
+                          <p className="text-xs text-gray-500">Tiempo estimado</p>
+                        </div>
+                        {unlockResult.result.data_safe !== undefined && (
+                          <div className={`${unlockResult.result.data_safe ? "bg-green-500/10 border-green-500/20" : "bg-amber-500/10 border-amber-500/20"} border rounded-lg px-3 py-2 text-center flex-1`}>
+                            <p className={`${unlockResult.result.data_safe ? "text-green-400" : "text-amber-400"} font-bold text-sm`}>{unlockResult.result.data_safe ? "Datos seguros" : "Posible perdida"}</p>
+                            <p className="text-xs text-gray-500">Datos</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {unlockResult.result?.warning && (
+                      <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3">
+                        <p className="text-amber-400 text-sm font-bold">Aviso importante</p>
+                        <p className="text-amber-300/80 text-sm mt-1">{unlockResult.result.warning}</p>
+                      </div>
+                    )}
+
+                    {unlockResult.result?.methods?.map((method: any, mi: number) => (
+                      <div key={mi} className="bg-white/5 rounded-xl p-4 border border-white/5">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-white font-bold text-sm">Metodo {mi + 1}: {method.name}</h4>
+                          <div className="flex gap-2">
+                            {method.time && <span className="text-xs bg-brand-600/20 text-brand-400 px-2 py-0.5 rounded-full">{method.time}</span>}
+                            {method.data_loss === false && <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Sin perdida</span>}
+                            {method.data_loss === true && <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full">Borra datos</span>}
+                          </div>
+                        </div>
+                        {method.steps?.map((step: string, si: number) => (
+                          <p key={si} className="text-sm text-gray-400 py-0.5 pl-2 border-l-2 border-brand-600/30 mb-1">{step}</p>
+                        ))}
+                        {method.requirement && (
+                          <p className="text-xs text-amber-400 mt-2 italic">Requisito: {method.requirement}</p>
+                        )}
+                      </div>
+                    ))}
+
+                    {unlockResult.result?.important && (
+                      <div className="bg-red-500/5 border border-red-500/20 rounded-lg p-3">
+                        <p className="text-red-400 text-sm">{unlockResult.result.important}</p>
+                      </div>
+                    )}
+
+                    {unlockResult.result?.boot_keys && (
+                      <div className="bg-white/5 rounded-xl p-4">
+                        <p className="text-white font-bold text-sm mb-2">Tecla Boot Menu por marca:</p>
+                        <div className="grid grid-cols-2 gap-1">
+                          {Object.entries(unlockResult.result.boot_keys).map(([brand, key]: [string, any]) => (
+                            <p key={brand} className="text-xs text-gray-400"><span className="text-gray-300">{brand}:</span> {key}</p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {unlockResult.result?.default_admin && (
+                      <div className="bg-white/5 rounded-xl p-4">
+                        <p className="text-white font-bold text-sm mb-2">Panel admin del router:</p>
+                        {Object.entries(unlockResult.result.default_admin).map(([isp, info]: [string, any]) => (
+                          <p key={isp} className="text-xs text-gray-400"><span className="text-gray-300">{isp}:</span> {info.url} — {info.user} / {info.pass}</p>
                         ))}
                       </div>
                     )}
+
+                    {unlockResult.personalized?.personalized_passwords && (
+                      <div className="bg-white/5 rounded-xl p-4">
+                        <p className="text-white font-bold text-sm mb-2">Contrasenas personalizadas ({unlockResult.personalized.total_generated} generadas):</p>
+                        <div className="grid grid-cols-2 gap-1 max-h-40 overflow-y-auto">
+                          {unlockResult.personalized.personalized_passwords.map((pw: string, i: number) => (
+                            <p key={i} className="text-xs text-brand-300 font-mono">{pw}</p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="bg-brand-600/10 border border-brand-500/20 rounded-xl p-4 text-center">
+                      <p className="text-brand-400 font-bold text-sm">Necesitas ayuda? Te guiamos por videollamada</p>
+                      <p className="text-xs text-gray-400 mt-1">Whatsapp: +34 620 300 647 — Respondemos en minutos</p>
+                    </div>
                   </div>
                 )}
                 <button onClick={() => { setShowUnlock(false); setUnlockResult(null); }}
