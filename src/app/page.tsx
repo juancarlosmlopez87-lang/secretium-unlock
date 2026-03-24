@@ -438,6 +438,27 @@ export default function Home() {
         </div>
       </section>
 
+      {/* CROSS-PROMO: ESCUDO */}
+      <section className="px-4 pb-12">
+        <div className="max-w-3xl mx-auto">
+          <div className="card-glass rounded-2xl p-6 border border-white/5 flex flex-col md:flex-row items-center gap-6">
+            <div className="flex-shrink-0 text-5xl">🛡️</div>
+            <div className="flex-1 text-center md:text-left">
+              <h3 className="text-white font-bold text-lg mb-1">Protege tu seguridad personal</h3>
+              <p className="text-sm text-gray-400 mb-3">
+                Alertas de emergencia, monitorizacion por voz, pruebas legales y chat con IA de seguridad.
+                Tu escudo digital personal, siempre activo.
+              </p>
+              <p className="text-xs text-gray-500 mb-4">Comprueba si tu contrasena es segura con nuestro verificador integrado.</p>
+              <a href="https://escudo-app-tau.vercel.app" target="_blank" rel="noopener noreferrer"
+                className="inline-block bg-brand-600/20 hover:bg-brand-600/40 border border-brand-500/30 text-brand-400 text-sm font-bold px-5 py-2 rounded-lg transition">
+                Descubre ESCUDO &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* FOOTER */}
       <footer className="border-t border-white/5 py-8 px-4">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
